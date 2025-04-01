@@ -5,16 +5,19 @@ ADMIN_FAYL = "admins.json"
 USER_FAYL = "users.json"
 
 
+# Ma'lumotlarni yuklash
 def yuklash(fayl_nomi):
-    if os.path.exists(fayl_nomi):
+    if os.path.exists(fayl_nomi) and os.stat(fayl_nomi).st_size > 0:
         with open(fayl_nomi, "r", encoding="utf-8") as fayl:
             return json.load(fayl)
     return []
+
 
 # Ma'lumotlarni saqlash
 def saqlash(fayl_nomi, malumotlar):
     with open(fayl_nomi, "w", encoding="utf-8") as fayl:
         json.dump(malumotlar, fayl, ensure_ascii=False, indent=4)
+
 
 # Parolni tekshirish
 def parolni_tekshir():
@@ -29,6 +32,7 @@ def parolni_tekshir():
         else:
             print("Xato! Parol 8-16 belgidan iborat bo‘lishi va harflar ham, sonlar ham bo‘lishi kerak!")
 
+
 admins = yuklash(ADMIN_FAYL)
 users = yuklash(USER_FAYL)
 
@@ -36,6 +40,7 @@ Super_admin = {
     "login": "admin2025",
     "parol": "parol2025"
 }
+
 
 def super_admin_menyu():
     while True:
@@ -51,21 +56,17 @@ def super_admin_menyu():
         if buyruq == "1":
             admin = {
                 "name": input("Adminning ismini kiriting: ").title(),
+                "username": input("Admin username kiriting: ").strip(),
                 "type": input("Admin turi (super/oddiy): ").strip(),
                 "parol": parolni_tekshir()
             }
 
-            while True:
-                username = input("Admin username kiriting: ").strip()
-                if any(a["username"] == username for a in admins):
-                    print("Bu username band! Boshqa tanlang.")
-                else:
-                    admin["username"] = username
-                    break
-
-            admins.append(admin)
-            saqlash(ADMIN_FAYL, admins)
-            print(f"Admin muvaffaqiyatli yaratildi: {admin['name']}!")
+            if any(a["username"] == admin["username"] for a in admins):
+                print("Bu username band! Boshqa tanlang.")
+            else:
+                admins.append(admin)
+                saqlash(ADMIN_FAYL, admins)
+                print(f"Admin muvaffaqiyatli yaratildi: {admin['name']}!")
 
         elif buyruq == "2":
             admin_menyu()
@@ -79,6 +80,7 @@ def super_admin_menyu():
 
         else:
             print("Noto‘g‘ri buyruq!")
+
 
 def admin_menyu():
     username = input("Admin username-ni kiriting: ").strip()
@@ -108,21 +110,17 @@ def admin_menyu():
         if buyruq == "1":
             user = {
                 "name": input("Foydalanuvchi ismini kiriting: ").title(),
+                "username": input("Foydalanuvchi username kiriting: ").strip(),
                 "type": "user",
                 "parol": parolni_tekshir()
             }
 
-            while True:
-                user_username = input("Foydalanuvchi username kiriting: ").strip()
-                if any(u["username"] == user_username for u in users):
-                    print("Bu username band! Boshqa nom tanlang.")
-                else:
-                    user["username"] = user_username
-                    break
-
-            users.append(user)
-            saqlash(USER_FAYL, users)
-            print(f"Foydalanuvchi muvaffaqiyatli yaratildi: {user['name']}!")
+            if any(u["username"] == user["username"] for u in users):
+                print("Bu username band! Boshqa nom tanlang.")
+            else:
+                users.append(user)
+                saqlash(USER_FAYL, users)
+                print(f"Foydalanuvchi muvaffaqiyatli yaratildi: {user['name']}!")
 
         elif buyruq == "2":
             user_menyu()
@@ -136,6 +134,7 @@ def admin_menyu():
 
         else:
             print("Noto‘g‘ri buyruq!")
+
 
 def user_menyu():
     username = input("Foydalanuvchi username-ni kiriting: ").strip()
@@ -173,6 +172,7 @@ def user_menyu():
 
         else:
             print("Noto‘g‘ri buyruq!")
+
 
 # Super admin login
 while True:
